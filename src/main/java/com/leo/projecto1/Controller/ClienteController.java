@@ -1,5 +1,6 @@
 package com.leo.projecto1.Controller;
 
+import com.leo.projecto1.DTO.ClienteDTO;
 import com.leo.projecto1.Model.ClienteModel;
 import com.leo.projecto1.Service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +21,43 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public ClienteModel getClienteById(@PathVariable Integer id) {
-        return clienteService.getClienteById(id);
+    public ClienteDTO getClienteById(@PathVariable Integer id) {
+        ClienteModel clienteModel = clienteService.getClienteById(id);
+        return convertToDto(clienteModel);
     }
 
     @PostMapping
-    public ClienteModel createCliente(@RequestBody ClienteModel cliente) {
-        return clienteService.createCliente(cliente);
+    public ClienteDTO createCliente(@RequestBody ClienteDTO clienteDTO) {
+        ClienteModel clienteModel = convertToEntity(clienteDTO);
+        ClienteModel createdCliente = clienteService.createCliente(clienteModel);
+        return convertToDto(createdCliente);
     }
 
     @PutMapping("/{id}")
-    public ClienteModel updateCliente(@PathVariable Integer id, @RequestBody ClienteModel cliente) {
-        return clienteService.updateCliente(id, cliente);
+    public ClienteDTO updateCliente(@PathVariable Integer id, @RequestBody ClienteDTO clienteDTO) {
+        ClienteModel clienteModel = convertToEntity(clienteDTO);
+        ClienteModel updatedCliente = clienteService.updateCliente(id, clienteModel);
+        return convertToDto(updatedCliente);
     }
 
     @DeleteMapping("/{id}")
     public void deleteCliente(@PathVariable Integer id) {
         clienteService.deleteCliente(id);
+    }
+
+    private ClienteDTO convertToDto(ClienteModel clienteModel) {
+        ClienteDTO clienteDTO = new ClienteDTO();
+        clienteDTO.setNombre(clienteModel.getNombre());
+        clienteDTO.setApellido(clienteModel.getApellido());
+        // No incluimos el número de documento en la respuesta
+        return clienteDTO;
+    }
+
+    private ClienteModel convertToEntity(ClienteDTO clienteDTO) {
+        ClienteModel clienteModel = new ClienteModel();
+        clienteModel.setNombre(clienteDTO.getNombre());
+        clienteModel.setApellido(clienteDTO.getApellido());
+        clienteModel.setNumeroDocumento(clienteDTO.getNumeroDocumento());
+        return clienteModel;
     }
 }
